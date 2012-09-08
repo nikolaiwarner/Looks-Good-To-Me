@@ -1,55 +1,82 @@
-refresh_time = 5 * 60000
+# Looks Good To Me
+# by Nikolai Warner, 2012
 
-good = 1
-better = 2
-best = 3
+class LooksGoodToMe
+  constructor: (options={}) ->
+    @refresh_rate = options.refresh_rate || 5 * 60000
 
-lgtm_regexes = [
-  /looks good to me/ig,
-  /lgtm/ig,
-  /\+1/g
-]
+    @good = options.good || 1
+    @better = options.better || 2
+    @best = options.best || 3
 
+    @regexes = options.regexes || [
+      /looks good to me/ig,
+      /lgtm/ig,
+      /\+1/g
+    ]
 
-window.lgtm_refresh = ->
+    if @refresh_rate > 0
+      setInterval(@refresh, @refresh_rate)
 
-  $('.pulls .listing').each (index, listing) =>
-    ones = 0
-    title = $(listing).find('h3')
-    pull_url = title.find('a').prop('href')
+    @refresh()
 
+  refresh: =>
     # Remove previous badges
-    title.find('.lgtm_badge').remove()
+    $('.lgtm_badge').remove()
 
-    # Get the pull id, for example: https://github.com/nikolaiwarner/Looks-Good-To-Me/pull/21
-    id = pull_url.split('/pull/')[1]
+    # We're on a pull request index page
+    $('.pulls .listing').each (index, listing) =>
+      console.log "LGTM: Pull request index page."
+      title = $(listing).find('h3')
+      pull_url = title.find('a').prop('href')
 
-    # Who needs apis? :)
-    # Get the pull comments, for example: https://github.com/nikolaiwarner/Looks-Good-To-Me/pull/21
-    $.get pull_url, (response) =>
+      # Who needs apis? :)
+      # Get the pull comments, for example: https://github.com/nikolaiwarner/Looks-Good-To-Me/pull/21
+      $.get pull_url, (response) =>
+        title.prepend(@make_a_badge(@count_ones(response)))
 
-      # Count plus ones in each comment
-      $('.comment-body', response).each (i, comment) =>
-        for regex in lgtm_regexes
-          if count = $(comment).text().match(regex)
-            ones += count.length
+    # We're on a pull request show page
+    $('#discussion_bucket').each (index, discussion) =>
+      console.log "LGTM: Pull request show page."
+      title = $(discussion).find('.discussion-topic-title')
+      merge_button = $(discussion).find('.mergeable.clean .minibutton')
 
-      if ones > 0
-        # Update title with lgtm count
-        badge = $('<span>')
-        badge.addClass('lgtm_badge')
-        badge.html("[+#{ones}]")
-
-        # Set the color based on strength
-        if ones >= good and ones < best
-          badge.addClass('lgtm_better')
-        else if ones >= best
-          badge.addClass('lgtm_best')
-        else
-          badge.addClass('lgtm_good')
-
-        title.prepend(badge)
+      if badge = @make_a_badge(@count_ones(discussion), 'lgtm_large')
+        badge.clone().prependTo(title)
+        badge.clone().prependTo(merge_button)
 
 
-window.lgtm_refresh()
-setInterval(window.lgtm_refresh, refresh_time)
+  # Count plus ones in each comment
+  count_ones: (string) =>
+    ones = 0
+    # Scrape out and count what we want from the string
+    $('.comment-body', string).each (index, comment) =>
+      for regex in @regexes
+        if count = $(comment).text().match(regex)
+          ones += count.length
+
+    console.log "LGTM: Found #{ones} plus ones."
+    return ones
+
+
+  make_a_badge: (ones=0, extra_classes='') =>
+    badge = undefined
+    if ones > 0
+      badge = $('<span>')
+      badge.addClass("lgtm_badge #{extra_classes}")
+      badge.html("+#{ones}")
+
+      # Set the color based on momentum
+      if ones >= @good and ones < @better
+        badge.addClass('lgtm_good')
+      else if ones >= @better and ones < @best
+        badge.addClass('lgtm_better')
+      else if ones >= @best
+        badge.addClass('lgtm_best')
+      else
+        badge.addClass('lgtm_okay')
+
+    return badge
+
+
+window.looks_good_to_me = new LooksGoodToMe()
