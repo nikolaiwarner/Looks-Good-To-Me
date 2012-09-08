@@ -1,0 +1,19 @@
+{
+  "name": "Looks Good To Me",
+  "version": "1.0",
+  "manifest_version": 2,
+  "description": "Augment Github pull request pages for greater plus one visibility.",
+
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*"],
+      "css": ["lgtm.css"],
+      "js": ["jquery-1.8.1.min.js", "lgtm.js"]
+    }
+  ],
+  "icons": {
+    "16":   "icon.png",
+    "48":   "icon.png",
+    "128":  "icon.png"
+  }
+}

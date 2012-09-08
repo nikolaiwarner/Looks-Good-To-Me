@@ -1,0 +1,15 @@
+.lgtm_badge {
+  margin-right: 5px;
+}
+
+.lgtm_good {
+  color: #C52323;
+}
+
+.lgtm_better {
+  color: #4183C4;
+}
+
+.lgtm_best {
+  color: #6CC644;
+}
