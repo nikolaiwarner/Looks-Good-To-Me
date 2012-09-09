@@ -58,6 +58,7 @@
       ones = 0;
       $('.comment-body', string).each(function(index, comment) {
         var count, regex, _i, _len, _ref, _results;
+        $(comment).find('.email-signature-reply').remove();
         _ref = _this.regexes;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {

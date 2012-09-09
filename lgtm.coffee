@@ -51,6 +51,9 @@ class LooksGoodToMe
     ones = 0
     # Scrape out and count what we want from the string
     $('.comment-body', string).each (index, comment) =>
+      # Clean up the comment body
+      $(comment).find('.email-signature-reply').remove()
+
       for regex in @regexes
         if count = $(comment).text().match(regex)
           ones += count.length
