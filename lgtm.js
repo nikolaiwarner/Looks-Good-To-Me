@@ -31,7 +31,7 @@
 
     LooksGoodToMe.prototype.refresh = function() {
       var _this = this;
-      $('.lgtm_badge').remove();
+      $('.lgtm_badge, .lgtm_button').remove();
       $('.pulls-list .list-browser-item').each(function(index, listing) {
         var pull_url, title;
         console.log("LGTM: Pull request index page.");
@@ -53,7 +53,7 @@
         message = _this.default_plus_one_message;
         refresh = _this.refresh;
         button = $("<button type='submit'>" + message + "</button>");
-        button.addClass('classy primary');
+        button.addClass('classy primary lgtm_button');
         button.click(function() {
           $(this).closest('form').find('.write-content textarea').html("" + message);
           return setTimeout(refresh, 5000);
