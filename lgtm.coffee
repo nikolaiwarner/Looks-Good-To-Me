@@ -24,7 +24,7 @@ class LooksGoodToMe
 
   refresh: =>
     # Remove previous badges
-    $('.lgtm_badge').remove()
+    $('.lgtm_badge, .lgtm_button').remove()
 
     # We're on a pull request index page
     $('.pulls-list .list-browser-item').each (index, listing) =>
@@ -51,7 +51,7 @@ class LooksGoodToMe
       message = @default_plus_one_message
       refresh = @refresh
       button = $("<button type='submit'>#{message}</button>")
-      button.addClass('classy primary')
+      button.addClass('classy primary lgtm_button')
       button.click ->
         $(@).closest('form').find('.write-content textarea').html("#{message}")
         setTimeout(refresh, 5000)
