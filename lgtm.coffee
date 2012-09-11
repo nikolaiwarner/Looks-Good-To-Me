@@ -27,8 +27,8 @@ class LooksGoodToMe
     $('.lgtm_badge').remove()
 
     # We're on a pull request index page
-    $('.pulls .listing').each (index, listing) =>
-      #console.log "LGTM: Pull request index page."
+    $('.pulls-list .list-browser-item').each (index, listing) =>
+      console.log "LGTM: Pull request index page."
       title = $(listing).find('h3')
       pull_url = title.find('a').prop('href')
 
@@ -71,7 +71,7 @@ class LooksGoodToMe
         if count = $(comment).text().match(regex)
           ones += count.length
 
-    #console.log "LGTM: Found #{ones} plus ones."
+    console.log "LGTM: Found #{ones} plus ones."
     return ones
 
 

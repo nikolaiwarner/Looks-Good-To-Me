@@ -32,8 +32,9 @@
     LooksGoodToMe.prototype.refresh = function() {
       var _this = this;
       $('.lgtm_badge').remove();
-      $('.pulls .listing').each(function(index, listing) {
+      $('.pulls-list .list-browser-item').each(function(index, listing) {
         var pull_url, title;
+        console.log("LGTM: Pull request index page.");
         title = $(listing).find('h3');
         pull_url = title.find('a').prop('href');
         return $.get(pull_url, function(response) {
@@ -81,6 +82,7 @@
         }
         return _results;
       });
+      console.log("LGTM: Found " + ones + " plus ones.");
       return ones;
     };
 
