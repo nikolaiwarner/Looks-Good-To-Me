@@ -5,6 +5,8 @@ class LooksGoodToMe
   constructor: (options={}) ->
     @refresh_rate = options.refresh_rate || 5 * 60000
 
+    @default_plus_one_message = options.default_plus_one_message || '+1'
+
     @good = options.good || 1
     @better = options.better || 2
     @best = options.best || 3
@@ -44,6 +46,16 @@ class LooksGoodToMe
       if badge = @make_a_badge(@count_ones(discussion), 'lgtm_large')
         badge.clone().prependTo(title)
         badge.clone().prependTo(merge_button)
+
+      # Show Plus One, the button
+      message = @default_plus_one_message
+      refresh = @refresh
+      button = $("<button type='submit'>#{message}</button>")
+      button.addClass('classy primary')
+      button.click ->
+        $(@).closest('form').find('.write-content textarea').html("#{message}")
+        setTimeout(refresh, 5000)
+      button.insertBefore('.discussion-bubble .classy.primary')
 
 
   # Count plus ones in each comment

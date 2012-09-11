@@ -18,6 +18,7 @@
       this.refresh = __bind(this.refresh, this);
 
       this.refresh_rate = options.refresh_rate || 5 * 60000;
+      this.default_plus_one_message = options.default_plus_one_message || '+1';
       this.good = options.good || 1;
       this.better = options.better || 2;
       this.best = options.best || 3;
@@ -40,14 +41,23 @@
         });
       });
       return $('#discussion_bucket').each(function(index, discussion) {
-        var badge, merge_button, title;
+        var badge, button, merge_button, message, refresh, title;
         console.log("LGTM: Pull request show page.");
         title = $(discussion).find('.discussion-topic-title');
         merge_button = $(discussion).find('.mergeable.clean .minibutton');
         if (badge = _this.make_a_badge(_this.count_ones(discussion), 'lgtm_large')) {
           badge.clone().prependTo(title);
-          return badge.clone().prependTo(merge_button);
+          badge.clone().prependTo(merge_button);
         }
+        message = _this.default_plus_one_message;
+        refresh = _this.refresh;
+        button = $("<button type='submit'>" + message + "</button>");
+        button.addClass('classy primary');
+        button.click(function() {
+          $(this).closest('form').find('.write-content textarea').html("" + message);
+          return setTimeout(refresh, 5000);
+        });
+        return button.insertBefore('.discussion-bubble .classy.primary');
       });
     };
 
