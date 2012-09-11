@@ -12,7 +12,7 @@ class LooksGoodToMe
     @regexes = options.regexes || [
       /looks good to me/ig,
       /lgtm/ig,
-      /\+1/g
+      /\+1(\s|\z)/g
     ]
 
     if @refresh_rate > 0
@@ -26,7 +26,7 @@ class LooksGoodToMe
 
     # We're on a pull request index page
     $('.pulls .listing').each (index, listing) =>
-      console.log "LGTM: Pull request index page."
+      #console.log "LGTM: Pull request index page."
       title = $(listing).find('h3')
       pull_url = title.find('a').prop('href')
 
@@ -53,12 +53,13 @@ class LooksGoodToMe
     $('.comment-body', string).each (index, comment) =>
       # Clean up the comment body
       $(comment).find('.email-signature-reply').remove()
+      $(comment).find('.email-quoted-reply').remove()
 
       for regex in @regexes
         if count = $(comment).text().match(regex)
           ones += count.length
 
-    console.log "LGTM: Found #{ones} plus ones."
+    #console.log "LGTM: Found #{ones} plus ones."
     return ones
 
 

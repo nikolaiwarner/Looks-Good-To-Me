@@ -21,7 +21,7 @@
       this.good = options.good || 1;
       this.better = options.better || 2;
       this.best = options.best || 3;
-      this.regexes = options.regexes || [/looks good to me/ig, /lgtm/ig, /\+1/g];
+      this.regexes = options.regexes || [/looks good to me/ig, /lgtm/ig, /\+1(\s|\z)/g];
       if (this.refresh_rate > 0) {
         setInterval(this.refresh, this.refresh_rate);
       }
@@ -33,7 +33,6 @@
       $('.lgtm_badge').remove();
       $('.pulls .listing').each(function(index, listing) {
         var pull_url, title;
-        console.log("LGTM: Pull request index page.");
         title = $(listing).find('h3');
         pull_url = title.find('a').prop('href');
         return $.get(pull_url, function(response) {
@@ -59,6 +58,7 @@
       $('.comment-body', string).each(function(index, comment) {
         var count, regex, _i, _len, _ref, _results;
         $(comment).find('.email-signature-reply').remove();
+        $(comment).find('.email-quoted-reply').remove();
         _ref = _this.regexes;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -71,7 +71,6 @@
         }
         return _results;
       });
-      console.log("LGTM: Found " + ones + " plus ones.");
       return ones;
     };
 
