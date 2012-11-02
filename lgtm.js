@@ -22,7 +22,7 @@
 
     LooksGoodToMe.prototype.refresh = function() {
       var _this = this;
-      $('.lgtm_badge, .lgtm_button').remove();
+      $('.lgtm_badge, .lgtm_button, .lgtm_icon').remove();
       $('.pulls-list .list-browser-item').each(function(index, listing) {
         var pull_url, title;
         console.log("LGTM: Pull request index page.");
@@ -30,7 +30,7 @@
         pull_url = title.find('a').prop('href');
         return $.get(pull_url, function(response) {
           title.prepend(_this.make_a_badge(_this.count_ones(response)));
-          return title.append(_this.get_ci_build_status_icon(response));
+          return title.append(_this.get_ci_build_status_icon(response).addClass('lgtm_icon'));
         });
       });
       return $('#discussion_bucket').each(function(index, discussion) {

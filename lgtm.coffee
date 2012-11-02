@@ -24,7 +24,7 @@ class LooksGoodToMe
 
   refresh: =>
     # Remove previous badges
-    $('.lgtm_badge, .lgtm_button').remove()
+    $('.lgtm_badge, .lgtm_button, .lgtm_icon').remove()
 
     # We're on a pull request index page
     $('.pulls-list .list-browser-item').each (index, listing) =>
@@ -37,7 +37,7 @@ class LooksGoodToMe
       # https://github.com/nikolaiwarner/Looks-Good-To-Me/pull/21
       $.get pull_url, (response) =>
         title.prepend(@make_a_badge(@count_ones(response)))
-        title.append(@get_ci_build_status_icon(response))
+        title.append(@get_ci_build_status_icon(response).addClass('lgtm_icon'))
 
     # We're on a pull request show page
     $('#discussion_bucket').each (index, discussion) =>
