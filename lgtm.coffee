@@ -33,9 +33,11 @@ class LooksGoodToMe
       pull_url = title.find('a').prop('href')
 
       # Who needs apis? :)
-      # Get the pull comments, for example: https://github.com/nikolaiwarner/Looks-Good-To-Me/pull/21
+      # Get the pull comments, for example:
+      # https://github.com/nikolaiwarner/Looks-Good-To-Me/pull/21
       $.get pull_url, (response) =>
         title.prepend(@make_a_badge(@count_ones(response)))
+        title.append(@get_ci_build_status_icon(response))
 
     # We're on a pull request show page
     $('#discussion_bucket').each (index, discussion) =>
@@ -93,6 +95,14 @@ class LooksGoodToMe
         badge.addClass('lgtm_okay')
 
     return badge
+
+
+  # Some projects use a CI system which output the build status into Github
+  # pull request messages. If this is included, show on index pages.
+  get_ci_build_status_icon: (page_content) =>
+    icon_name = 'status_icon'
+    $(".starting-comment img[src*=#{icon_name}]", page_content)
+
 
 
 window.looks_good_to_me = new LooksGoodToMe()
