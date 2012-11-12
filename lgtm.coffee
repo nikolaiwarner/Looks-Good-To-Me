@@ -17,10 +17,13 @@ class LooksGoodToMe
       /\+1(\s|\z)/g
     ]
 
+    @load_settings()
+
     if @refresh_rate > 0
       setInterval(@refresh, @refresh_rate)
 
     @refresh()
+
 
   refresh: =>
     # Remove previous badges
@@ -95,6 +98,9 @@ class LooksGoodToMe
         badge.addClass('lgtm_okay')
 
     return badge
+
+  load_settings: =>
+    # default_plus_one_message, refresh_rate, regexes
 
 
   # Some projects use a CI system which output the build status into Github

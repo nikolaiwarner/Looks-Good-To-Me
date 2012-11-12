@@ -11,6 +11,11 @@
       "js": ["jquery-1.8.1.min.js", "lgtm.js"]
     }
   ],
+
+  "permissions": [
+    "storage"
+  ],
+
   "icons": {
     "16":   "icon.png",
     "48":   "icon.png",
