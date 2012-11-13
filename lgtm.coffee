@@ -17,12 +17,18 @@ class LooksGoodToMe
       /\+1(\s|\z)/g
     ]
 
-    @load_settings()
+    @restore_options()
 
-    if @refresh_rate > 0
-      setInterval(@refresh, @refresh_rate)
+    # Initialize Chrome Events
+    document.addEventListener "DOMContentLoaded", =>
+      if $("body.lgtm.options").length > 0 # Init for Options Page
+        $(".save_button").click => @save_options()
 
-    @refresh()
+      else # Init for Github pages
+        if @refresh_rate > 0
+          setInterval(@refresh, @refresh_rate)
+
+        @refresh()
 
 
   refresh: =>
@@ -39,7 +45,8 @@ class LooksGoodToMe
       # Get the pull comments, for example:
       # https://github.com/nikolaiwarner/Looks-Good-To-Me/pull/21
       $.get pull_url, (response) =>
-        title.prepend(@make_a_badge(@count_ones(response)))
+        title.prepend(@make_a_badge(@count_ones(response).ones))
+        title.prepend(@list_participants(@count_ones(response).participants))
         title.append(@get_ci_build_status_icon(response).addClass('lgtm_icon'))
 
     # We're on a pull request show page
@@ -48,7 +55,7 @@ class LooksGoodToMe
       title = $(discussion).find('.discussion-topic-title')
       merge_button = $(discussion).find('.mergeable.clean .minibutton')
 
-      if badge = @make_a_badge(@count_ones(discussion), 'lgtm_large')
+      if badge = @make_a_badge(@count_ones(discussion).ones, 'lgtm_large')
         badge.clone().prependTo(title)
         badge.clone().prependTo(merge_button)
 
@@ -66,6 +73,7 @@ class LooksGoodToMe
   # Count plus ones in each comment
   count_ones: (string) =>
     ones = 0
+    particitpants = []
     # Scrape out and count what we want from the string
     $('.comment-body', string).each (index, comment) =>
       # Clean up the comment body
@@ -76,8 +84,16 @@ class LooksGoodToMe
         if count = $(comment).text().match(regex)
           ones += count.length
 
+          # Capture information about particitpant
+          particitpants.push
+            name: $(comment).find('span.gravatar img')
+            image: $(comment).find('.author').text()
+
+
     console.log "LGTM: Found #{ones} plus ones."
-    return ones
+    return
+      ones: ones
+      participants: participants
 
 
   make_a_badge: (ones=0, extra_classes='') =>
@@ -99,8 +115,47 @@ class LooksGoodToMe
 
     return badge
 
-  load_settings: =>
+
+  list_participants: (participants=[]) =>
+    list = $('<span>')
+    for participant in participants
+      #participant
+      #list.append()
+
+
+  restore_options: =>
     # default_plus_one_message, refresh_rate, regexes
+
+    chrome.storage.sync.get null, (items) =>
+      $("#regexes").attr("checked", (items["show_badge"] == "true"))
+      $("#refresh_rate").attr("checked", (items["show_notification"] == "true"))
+      $("#ci_status_selector").val(items["rss_url"])
+      $("#default_plus_one_message").val(items["rss_url"])
+
+    # Listen for storage changes
+    chrome.storage.onChanged.addListener (changes, namespace) ->
+      for (key in changes) {
+        storageChange = changes[key]
+
+        @[key] = storageChange.newValue
+
+        console.log('Storage key "%s" in namespace "%s" changed. ' +
+                    'Old value was "%s", new value is "%s".',
+                    key,
+                    namespace,
+                    storageChange.oldValue,
+                    storageChange.newValue);
+
+
+  save_options: =>
+    chrome.storage.sync.set
+      'regexes': $('#regexes').val()
+      'refresh_rate': $('#refresh_rate').val()
+      'ci_status_selector': $('#ci_status_selector').val()
+      'default_plus_one_message': $('#default_plus_one_message').val()
+      =>
+        message('Settings saved.')
+
 
 
   # Some projects use a CI system which output the build status into Github
