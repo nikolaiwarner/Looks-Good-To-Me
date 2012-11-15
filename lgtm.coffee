@@ -91,9 +91,10 @@ class LooksGoodToMe
 
 
     console.log "LGTM: Found #{ones} plus ones."
-    return
+    return {
       ones: ones
       participants: participants
+    }
 
 
   make_a_badge: (ones=0, extra_classes='') =>
@@ -119,6 +120,7 @@ class LooksGoodToMe
   list_participants: (participants=[]) =>
     list = $('<span>')
     for participant in participants
+      console.log participant
       #participant
       #list.append()
 
@@ -134,28 +136,18 @@ class LooksGoodToMe
 
     # Listen for storage changes
     chrome.storage.onChanged.addListener (changes, namespace) ->
-      for (key in changes) {
+      for key in changes
         storageChange = changes[key]
-
         @[key] = storageChange.newValue
-
-        console.log('Storage key "%s" in namespace "%s" changed. ' +
-                    'Old value was "%s", new value is "%s".',
-                    key,
-                    namespace,
-                    storageChange.oldValue,
-                    storageChange.newValue);
-
+        console.log('Storage key "%s" in namespace "%s" changed. Old value was "%s", new value is "%s".', key, namespace, storageChange.oldValue, storageChange.newValue)
 
   save_options: =>
-    chrome.storage.sync.set
+    chrome.storage.sync.set()
       'regexes': $('#regexes').val()
       'refresh_rate': $('#refresh_rate').val()
       'ci_status_selector': $('#ci_status_selector').val()
       'default_plus_one_message': $('#default_plus_one_message').val()
-      =>
-        message('Settings saved.')
-
+      , => message('Settings saved.')
 
 
   # Some projects use a CI system which output the build status into Github
