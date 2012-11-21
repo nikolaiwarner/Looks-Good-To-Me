@@ -1,0 +1,28 @@
+!!! 5
+%html
+  %head
+    %title
+      Looks Good To Me Options
+
+    %link{ href: "stylesheet.css", media: "screen", rel: "stylesheet", type: "text/css" }
+    %script{ src: "jquery-1.8.1.min.js", type: "text/javascript" }
+    %script{ src: "lgtm.js", type: "text/javascript" }
+
+  %body.lgtm.options
+
+
+  %h1.title
+    Looks Good To Me Options
+
+  %ul
+    %li
+      Array object of regexes that select valid plus one strings:
+      %textarea#regexes
+
+    %li
+      %input#show_badge{ type: 'checkbox', checked: true }
+      Show Current Streak
+
+    %li
+      %button.save_button Save Options
+
