@@ -26,3 +26,20 @@
 .lgtm_best {
   background-color: #6CC644;
 }
+
+.lgtm_icon {
+  margin-left: 5px;
+}
+
+.lgtm_participants {
+  margin-left: 5px;
+}
+
+.participant_thumb {
+  width: 15px;
+  height: 15px;
+  padding: 1px;
+  margin: 1px;
+  border: 1px solid #999;
+  background-color: #fff
+}
