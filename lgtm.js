@@ -200,6 +200,6 @@
 
   })();
 
-  root.looks_good_to_me = new LooksGoodToMe();
+  window.looks_good_to_me = new LooksGoodToMe();
 
 }).call(this);

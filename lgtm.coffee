@@ -157,5 +157,4 @@ class LooksGoodToMe
     $(".starting-comment img[src*=#{icon_name}]", page_content)
 
 
-
 window.looks_good_to_me = new LooksGoodToMe()
