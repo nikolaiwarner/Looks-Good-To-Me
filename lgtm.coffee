@@ -16,7 +16,8 @@ class LooksGoodToMe
     @regexes = options.regexes || [
       /looks good to me/ig,
       /lgtm/ig,
-      /\+1(\s|\z)/g
+      /\+1(\s|\z)/g,
+      /title=":\+1:"/ig
     ]
 
     @restore_options()
@@ -86,7 +87,7 @@ class LooksGoodToMe
       $(comment).find('.email-quoted-reply').remove()
 
       for regex in @regexes
-        if count = $(comment).text().match(regex)
+        if count = $(comment).html().match(regex)
           ones += count.length
 
           # Capture information about particitpant
