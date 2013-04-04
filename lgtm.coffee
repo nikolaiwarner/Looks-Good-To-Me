@@ -16,7 +16,7 @@ class LooksGoodToMe
     @regexes = options.regexes || [
       /looks good to me/ig,
       /lgtm/ig,
-      /\+1(\s|\z)/g,
+      /(\s|\z|>)\+1(\s|\z|<)/g,
       /title=":\+1:"/ig
     ]
 
@@ -51,19 +51,22 @@ class LooksGoodToMe
         container.addClass('lgtm_container')
         title.before(container)
 
-        container.append(@make_a_badge(@count_ones(response).ones))
-        container.find('.lgtm_badge').append(@list_participants(@count_ones(response).participants))
+        ones_count = @count_ones(response)
+        container.append(@make_a_badge(ones_count.ones))
+        container.find('.lgtm_badge').append(@list_participants(ones_count.participants))
         #container.append(@get_ci_build_status_icon(response).addClass('lgtm_icon'))
 
 
     # We're on a pull request show page
     $('#discussion_bucket').each (index, discussion) =>
       title = $(discussion).find('.discussion-topic-title')
-      merge_button = $(discussion).find('.mergeable.clean .minibutton')
+      merge_button = $(discussion).find('.mergeable .minibutton').first()
 
-      if badge = @make_a_badge(@count_ones(discussion).ones, 'lgtm_large')
+      ones_count = @count_ones(discussion)
+      if badge = @make_a_badge(ones_count.ones, 'lgtm_large')
         badge.clone().prependTo(title)
         badge.clone().prependTo(merge_button)
+        merge_button.find('.lgtm_large').append(@list_participants(ones_count.participants))
 
       # Show Plus One, the button
       message = @default_plus_one_message
@@ -88,14 +91,14 @@ class LooksGoodToMe
 
       for regex in @regexes
         if count = $(comment).html().match(regex)
-          ones += count.length
+          ones += 1
 
           # Capture information about particitpant
           comment_bubble = $(comment).closest('.discussion-bubble')
           participants.push
             name: $(comment_bubble).find('.comment-header-author').text()
             image: $(comment_bubble).find('.discussion-bubble-avatar')
-
+          break
 
     return {
       ones: ones

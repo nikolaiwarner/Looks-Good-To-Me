@@ -31,7 +31,7 @@
       this.good = options.good || 1;
       this.better = options.better || 2;
       this.best = options.best || 3;
-      this.regexes = options.regexes || [/looks good to me/ig, /lgtm/ig, /\+1(\s|\z)/g, /title=":\+1:"/ig];
+      this.regexes = options.regexes || [/looks good to me/ig, /lgtm/ig, /(\s|\z|>)\+1(\s|\z|<)/g, /title=":\+1:"/ig];
       this.restore_options();
       if (this.refresh_rate > 0) {
         setInterval(this.refresh, this.refresh_rate);
@@ -47,21 +47,24 @@
         title = $(listing).find('h3');
         pull_url = title.find('a').prop('href');
         return $.get(pull_url, function(response) {
-          var container;
+          var container, ones_count;
           container = $('<div>');
           container.addClass('lgtm_container');
           title.before(container);
-          container.append(_this.make_a_badge(_this.count_ones(response).ones));
-          return container.find('.lgtm_badge').append(_this.list_participants(_this.count_ones(response).participants));
+          ones_count = _this.count_ones(response);
+          container.append(_this.make_a_badge(ones_count.ones));
+          return container.find('.lgtm_badge').append(_this.list_participants(ones_count.participants));
         });
       });
       return $('#discussion_bucket').each(function(index, discussion) {
-        var badge, button, merge_button, message, refresh, title;
+        var badge, button, merge_button, message, ones_count, refresh, title;
         title = $(discussion).find('.discussion-topic-title');
-        merge_button = $(discussion).find('.mergeable.clean .minibutton');
-        if (badge = _this.make_a_badge(_this.count_ones(discussion).ones, 'lgtm_large')) {
+        merge_button = $(discussion).find('.mergeable .minibutton').first();
+        ones_count = _this.count_ones(discussion);
+        if (badge = _this.make_a_badge(ones_count.ones, 'lgtm_large')) {
           badge.clone().prependTo(title);
           badge.clone().prependTo(merge_button);
+          merge_button.find('.lgtm_large').append(_this.list_participants(ones_count.participants));
         }
         message = _this.default_plus_one_message;
         refresh = _this.refresh;
@@ -89,12 +92,13 @@
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           regex = _ref[_i];
           if (count = $(comment).html().match(regex)) {
-            ones += count.length;
+            ones += 1;
             comment_bubble = $(comment).closest('.discussion-bubble');
-            _results.push(participants.push({
+            participants.push({
               name: $(comment_bubble).find('.comment-header-author').text(),
               image: $(comment_bubble).find('.discussion-bubble-avatar')
-            }));
+            });
+            break;
           } else {
             _results.push(void 0);
           }
