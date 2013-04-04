@@ -53,7 +53,7 @@ class LooksGoodToMe
 
         container.append(@make_a_badge(@count_ones(response).ones))
         container.find('.lgtm_badge').append(@list_participants(@count_ones(response).participants))
-        container.append(@get_ci_build_status_icon(response).addClass('lgtm_icon'))
+        #container.append(@get_ci_build_status_icon(response).addClass('lgtm_icon'))
 
 
     # We're on a pull request show page
@@ -69,11 +69,11 @@ class LooksGoodToMe
       message = @default_plus_one_message
       refresh = @refresh
       button = $("<button type='submit'>#{message}</button>")
-      button.addClass('classy primary lgtm_button')
+      button.addClass('button primary lgtm_button')
       button.click ->
         $(@).closest('form').find('.write-content textarea').html("#{message}")
         setTimeout(refresh, 5000)
-      button.insertBefore('.discussion-bubble .classy.primary')
+      button.insertBefore('.discussion-bubble .button.primary')
 
 
   # Count plus ones in each comment
