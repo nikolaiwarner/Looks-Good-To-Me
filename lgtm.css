@@ -12,19 +12,19 @@
 }
 
 .lgtm_okay {
-  background-color: #999;
+  background-color: #0c1707;
 }
 
 .lgtm_good {
-  background-color: #C52323;
+  background-color: #2b5419;
 }
 
 .lgtm_better {
-  background-color: #4183C4;
+  background-color: #4b902c;
 }
 
 .lgtm_best {
-  background-color: #6CC644;
+  background-color: #6cc644;
 }
 
 .lgtm_icon {
