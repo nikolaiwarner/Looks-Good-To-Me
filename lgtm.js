@@ -96,7 +96,7 @@
             comment_bubble = $(comment).closest('.discussion-bubble');
             participants.push({
               name: $(comment_bubble).find('.comment-header-author').text(),
-              image: $(comment_bubble).find('.discussion-bubble-avatar')
+              image: $(comment_bubble).find('.discussion-bubble-avatar').clone()
             });
             break;
           } else {
