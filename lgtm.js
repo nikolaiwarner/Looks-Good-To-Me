@@ -44,7 +44,7 @@
       $('.lgtm_badge, .lgtm_button, .lgtm_icon, .lgtm_container').remove();
       $('.pulls-list .list-browser-item').each(function(index, listing) {
         var pull_url, title;
-        title = $(listing).find('h3');
+        title = $(listing).find('h4');
         pull_url = title.find('a').prop('href');
         return $.get(pull_url, function(response) {
           var container, ones_count;

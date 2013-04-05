@@ -40,7 +40,7 @@ class LooksGoodToMe
 
     # We're on a pull request index page
     $('.pulls-list .list-browser-item').each (index, listing) =>
-      title = $(listing).find('h3')
+      title = $(listing).find('h4')
       pull_url = title.find('a').prop('href')
 
       # Who needs apis? :)
