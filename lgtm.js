@@ -42,7 +42,7 @@
     LooksGoodToMe.prototype.refresh = function() {
       var _this = this;
       $('.lgtm_badge, .lgtm_button, .lgtm_icon, .lgtm_container').remove();
-      $('.pulls-list .list-browser-item').each(function(index, listing) {
+      $('.pulls-list-group .list-group-item').each(function(index, listing) {
         var pull_url, title;
         title = $(listing).find('h4');
         pull_url = title.find('a').prop('href');

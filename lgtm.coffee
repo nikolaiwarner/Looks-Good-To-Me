@@ -39,7 +39,7 @@ class LooksGoodToMe
     $('.lgtm_badge, .lgtm_button, .lgtm_icon, .lgtm_container').remove()
 
     # We're on a pull request index page
-    $('.pulls-list .list-browser-item').each (index, listing) =>
+    $('.pulls-list-group .list-group-item').each (index, listing) =>
       title = $(listing).find('h4')
       pull_url = title.find('a').prop('href')
 
