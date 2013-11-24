@@ -42,6 +42,8 @@ class LooksGoodToMe
     $('.pulls-list-group .list-group-item').each (index, listing) =>
       title = $(listing).find('h4')
       pull_url = title.find('a').prop('href')
+      authorInfo = $(listing).find('.list-group-item-meta li').first()
+      authorName = authorInfo.find('a').not('.gravatar').text()
 
       # Who needs apis? :)
       # Get the pull comments, for example:
@@ -51,7 +53,7 @@ class LooksGoodToMe
         container.addClass('lgtm_container')
         title.before(container)
 
-        ones_count = @count_ones(response)
+        ones_count = @count_ones(response, authorName)
         container.append(@make_a_badge(ones_count.ones))
         container.find('.lgtm_badge').append(@list_participants(ones_count.participants))
         #container.append(@get_ci_build_status_icon(response).addClass('lgtm_icon'))
@@ -80,24 +82,32 @@ class LooksGoodToMe
 
 
   # Count plus ones in each comment
-  count_ones: (string) =>
+  count_ones: (string, authorName) =>
+
     ones = 0
-    participants = []
+    participants = {}
+
     # Scrape out and count what we want from the string
     $('.comment-body', string).each (index, comment) =>
       # Clean up the comment body
       $(comment).find('.email-signature-reply').remove()
       $(comment).find('.email-quoted-reply').remove()
 
+      # Capture information about particitpant
+      comment_bubble = $(comment).closest('.discussion-bubble')
+      participantName = $(comment_bubble).find('.comment-header-author').text()
+      participantImage = $(comment_bubble).find('.discussion-bubble-avatar').clone()
+
+      # You can't upvote your own pull request or vote twice
+      if participants[participantName] or participantName == authorName
+        return
+
       for regex in @regexes
         if count = $(comment).html().match(regex)
           ones += 1
 
-          # Capture information about particitpant
-          comment_bubble = $(comment).closest('.discussion-bubble')
-          participants.push
-            name: $(comment_bubble).find('.comment-header-author').text()
-            image: $(comment_bubble).find('.discussion-bubble-avatar').clone()
+          # Save name and image of participant
+          participants[participantName] = participantImage
           break
 
     return {
@@ -126,12 +136,11 @@ class LooksGoodToMe
     return badge
 
 
-  list_participants: (participants=[]) =>
+  list_participants: (participants={}) =>
     list = $('<span>')
     list.addClass('lgtm_participants')
-    for participant in participants
-      image = participant.image
-      image.prop('title', participant.name)
+    for name, image of participants
+      image.prop('title', name)
       image.addClass('participant_thumb')
       list.append(image)
     return list
