@@ -49,10 +49,11 @@
         });
       });
       return $('#discussion_bucket').each(function(index, discussion) {
-        var badge, button, merge_button, message, ones_count, refresh, title;
+        var authorName, badge, button, merge_button, message, ones_count, refresh, title;
         title = $(discussion).find('.discussion-topic-title');
         merge_button = $(discussion).find('.mergeable .minibutton').first();
-        ones_count = _this.count_ones(discussion);
+        authorName = $(discussion).find('.discussion-topic-author a').text();
+        ones_count = _this.count_ones(discussion, authorName);
         if (badge = _this.make_a_badge(ones_count.ones, 'lgtm_large')) {
           badge.clone().prependTo(title);
           badge.clone().prependTo(merge_button);

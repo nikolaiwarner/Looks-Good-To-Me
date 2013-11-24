@@ -63,8 +63,9 @@ class LooksGoodToMe
     $('#discussion_bucket').each (index, discussion) =>
       title = $(discussion).find('.discussion-topic-title')
       merge_button = $(discussion).find('.mergeable .minibutton').first()
+      authorName = $(discussion).find('.discussion-topic-author a').text()
 
-      ones_count = @count_ones(discussion)
+      ones_count = @count_ones(discussion, authorName)
       if badge = @make_a_badge(ones_count.ones, 'lgtm_large')
         badge.clone().prependTo(title)
         badge.clone().prependTo(merge_button)
