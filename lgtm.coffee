@@ -15,6 +15,7 @@ class LooksGoodToMe
       /lgtm/ig
       /(\s|\z|>)?\+1(\s|\z|<)?/g
       /title=":\+1:"/ig
+      /title=":thumbsup:"/ig
     ]
 
     @restore_options()

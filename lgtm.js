@@ -19,7 +19,7 @@
       this.good = options.good || 1;
       this.better = options.better || 2;
       this.best = options.best || 3;
-      this.regexes = options.regexes || [/looks good to me/ig, /lgtm/ig, /(\s|\z|>)?\+1(\s|\z|<)?/g, /title=":\+1:"/ig];
+      this.regexes = options.regexes || [/looks good to me/ig, /lgtm/ig, /(\s|\z|>)?\+1(\s|\z|<)?/g, /title=":\+1:"/ig, /title=":thumbsup:"/ig];
       this.restore_options();
       if (this.refresh_rate > 0) {
         setInterval(this.refresh, this.refresh_rate);
