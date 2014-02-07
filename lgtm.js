@@ -8,7 +8,6 @@
       if (options == null) {
         options = {};
       }
-      this.get_ci_build_status_icon = __bind(this.get_ci_build_status_icon, this);
       this.save_options = __bind(this.save_options, this);
       this.restore_options = __bind(this.restore_options, this);
       this.list_participants = __bind(this.list_participants, this);
@@ -16,12 +15,11 @@
       this.count_ones = __bind(this.count_ones, this);
       this.refresh = __bind(this.refresh, this);
       this.refresh_rate = options.refresh_rate || 5 * 60000;
-      this.ci_status_selector = options.ci_status_selector || 'status_icon';
       this.default_plus_one_message = options.default_plus_one_message || '+1';
       this.good = options.good || 1;
       this.better = options.better || 2;
       this.best = options.best || 3;
-      this.regexes = options.regexes || [/looks good to me/ig, /lgtm/ig, /(\s|\z|>)\+1(\s|\z|<)/g, /title=":\+1:"/ig];
+      this.regexes = options.regexes || [/looks good to me/ig, /lgtm/ig, /(\s|\z|>)?\+1(\s|\z|<)?/g, /title=":\+1:"/ig];
       this.restore_options();
       if (this.refresh_rate > 0) {
         setInterval(this.refresh, this.refresh_rate);
@@ -33,27 +31,27 @@
       var _this = this;
       $('.lgtm_badge, .lgtm_button, .lgtm_icon, .lgtm_container').remove();
       $('.pulls-list-group .list-group-item').each(function(index, listing) {
-        var authorInfo, authorName, pull_url, title;
+        var authorInfo, author_name, pull_url, title;
         title = $(listing).find('h4');
         pull_url = title.find('a').prop('href');
         authorInfo = $(listing).find('.list-group-item-meta li').first();
-        authorName = authorInfo.find('a').not('.gravatar').text();
+        author_name = authorInfo.find('a').not('.gravatar').text();
         return $.get(pull_url, function(response) {
           var container, ones_count;
           container = $('<div>');
           container.addClass('lgtm_container');
           title.before(container);
-          ones_count = _this.count_ones(response, authorName);
+          ones_count = _this.count_ones(response, author_name);
           container.append(_this.make_a_badge(ones_count.ones));
           return container.find('.lgtm_badge').append(_this.list_participants(ones_count.participants));
         });
       });
-      return $('#discussion_bucket').each(function(index, discussion) {
-        var authorName, badge, button, merge_button, message, ones_count, refresh, title;
-        title = $(discussion).find('.discussion-topic-title');
-        merge_button = $(discussion).find('.mergeable .minibutton').first();
-        authorName = $(discussion).find('.discussion-topic-author a').text();
-        ones_count = _this.count_ones(discussion, authorName);
+      return $('.view-pull-request').each(function(index, pullrequest) {
+        var author_name, badge, button, merge_button, message, ones_count, refresh, title;
+        title = $(pullrequest).find('.gh-header-title');
+        merge_button = $(pullrequest).find('.merge-branch-action').first();
+        author_name = $(pullrequest).find('.gh-header-meta .author').text();
+        ones_count = _this.count_ones(pullrequest, author_name);
         if (badge = _this.make_a_badge(ones_count.ones, 'lgtm_large')) {
           badge.clone().prependTo(title);
           badge.clone().prependTo(merge_button);
@@ -67,32 +65,30 @@
           $(this).closest('form').find('.write-content textarea').html("" + message);
           return setTimeout(refresh, 5000);
         });
-        return button.insertBefore('.discussion-bubble .button.primary');
+        return button.insertBefore('.timeline-new-comment .button.primary');
       });
     };
 
-    LooksGoodToMe.prototype.count_ones = function(string, authorName) {
+    LooksGoodToMe.prototype.count_ones = function(string, author_name) {
       var ones, participants,
         _this = this;
       ones = 0;
       participants = {};
-      $('.comment-body', string).each(function(index, comment) {
-        var comment_bubble, count, participantImage, participantName, regex, _i, _len, _ref, _results;
+      $('.timeline-comment-wrapper', string).each(function(index, comment) {
+        var participant_image, participant_name, regex, timeline_comment, _i, _len, _ref, _results;
         $(comment).find('.email-signature-reply').remove();
         $(comment).find('.email-quoted-reply').remove();
-        comment_bubble = $(comment).closest('.discussion-bubble');
-        participantName = $(comment_bubble).find('.comment-header-author').text();
-        participantImage = $(comment_bubble).find('.discussion-bubble-avatar').clone();
-        if (participants[participantName] || participantName === authorName) {
-          return;
-        }
+        timeline_comment = $(comment).find('.comment-body p').html();
+        participant_name = $(comment).find('.timeline-comment-header-text .author').text();
+        participant_image = $(comment).find('.timeline-comment-avatar').clone();
         _ref = _this.regexes;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           regex = _ref[_i];
-          if (count = $(comment).html().match(regex)) {
+          console.log(regex, timeline_comment.match(regex), timeline_comment);
+          if (timeline_comment.match(regex)) {
             ones += 1;
-            participants[participantName] = participantImage;
+            participants[participant_name] = participant_image;
             break;
           } else {
             _results.push(void 0);
@@ -153,7 +149,6 @@
       chrome.storage.sync.get(null, function(items) {
         $("#regexes").attr("checked", items["show_badge"] === "true");
         $("#refresh_rate").attr("checked", items["show_notification"] === "true");
-        $("#ci_status_selector").val(items["rss_url"]);
         return $("#default_plus_one_message").val(items["rss_url"]);
       });
       return chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -174,15 +169,10 @@
       return chrome.storage.sync.set()({
         'regexes': $('#regexes').val(),
         'refresh_rate': $('#refresh_rate').val(),
-        'ci_status_selector': $('#ci_status_selector').val(),
         'default_plus_one_message': $('#default_plus_one_message').val()
       }, function() {
         return message('Settings saved.');
       });
-    };
-
-    LooksGoodToMe.prototype.get_ci_build_status_icon = function(page_content) {
-      return $(".starting-comment img[src*=" + this.ci_status_selector + "]", page_content);
     };
 
     return LooksGoodToMe;

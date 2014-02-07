@@ -4,9 +4,6 @@
 class LooksGoodToMe
   constructor: (options={}) ->
     @refresh_rate = options.refresh_rate || 5 * 60000
-
-    @ci_status_selector = options.ci_status_selector || 'status_icon'
-
     @default_plus_one_message = options.default_plus_one_message || '+1'
 
     @good = options.good || 1
@@ -14,9 +11,9 @@ class LooksGoodToMe
     @best = options.best || 3
 
     @regexes = options.regexes || [
-      /looks good to me/ig,
-      /lgtm/ig,
-      /(\s|\z|>)\+1(\s|\z|<)/g,
+      /looks good to me/ig
+      /lgtm/ig
+      /(\s|\z|>)?\+1(\s|\z|<)?/g
       /title=":\+1:"/ig
     ]
 
@@ -33,7 +30,6 @@ class LooksGoodToMe
       setInterval(@refresh, @refresh_rate)
     @refresh()
 
-
   refresh: =>
     # Remove previous badges
     $('.lgtm_badge, .lgtm_button, .lgtm_icon, .lgtm_container').remove()
@@ -43,7 +39,7 @@ class LooksGoodToMe
       title = $(listing).find('h4')
       pull_url = title.find('a').prop('href')
       authorInfo = $(listing).find('.list-group-item-meta li').first()
-      authorName = authorInfo.find('a').not('.gravatar').text()
+      author_name = authorInfo.find('a').not('.gravatar').text()
 
       # Who needs apis? :)
       # Get the pull comments, for example:
@@ -53,19 +49,17 @@ class LooksGoodToMe
         container.addClass('lgtm_container')
         title.before(container)
 
-        ones_count = @count_ones(response, authorName)
+        ones_count = @count_ones(response, author_name)
         container.append(@make_a_badge(ones_count.ones))
         container.find('.lgtm_badge').append(@list_participants(ones_count.participants))
-        #container.append(@get_ci_build_status_icon(response).addClass('lgtm_icon'))
-
 
     # We're on a pull request show page
-    $('#discussion_bucket').each (index, discussion) =>
-      title = $(discussion).find('.discussion-topic-title')
-      merge_button = $(discussion).find('.mergeable .minibutton').first()
-      authorName = $(discussion).find('.discussion-topic-author a').text()
+    $('.view-pull-request').each (index, pullrequest) =>
+      title = $(pullrequest).find('.gh-header-title')
+      merge_button = $(pullrequest).find('.merge-branch-action').first()
+      author_name = $(pullrequest).find('.gh-header-meta .author').text()
 
-      ones_count = @count_ones(discussion, authorName)
+      ones_count = @count_ones(pullrequest, author_name)
       if badge = @make_a_badge(ones_count.ones, 'lgtm_large')
         badge.clone().prependTo(title)
         badge.clone().prependTo(merge_button)
@@ -79,43 +73,39 @@ class LooksGoodToMe
       button.click ->
         $(@).closest('form').find('.write-content textarea').html("#{message}")
         setTimeout(refresh, 5000)
-      button.insertBefore('.discussion-bubble .button.primary')
-
+      button.insertBefore('.timeline-new-comment .button.primary')
 
   # Count plus ones in each comment
-  count_ones: (string, authorName) =>
-
+  count_ones: (string, author_name) =>
     ones = 0
     participants = {}
 
     # Scrape out and count what we want from the string
-    $('.comment-body', string).each (index, comment) =>
+    $('.timeline-comment-wrapper', string).each (index, comment) =>
       # Clean up the comment body
       $(comment).find('.email-signature-reply').remove()
       $(comment).find('.email-quoted-reply').remove()
 
       # Capture information about particitpant
-      comment_bubble = $(comment).closest('.discussion-bubble')
-      participantName = $(comment_bubble).find('.comment-header-author').text()
-      participantImage = $(comment_bubble).find('.discussion-bubble-avatar').clone()
+      timeline_comment = $(comment).find('.comment-body p').html()
+      participant_name = $(comment).find('.timeline-comment-header-text .author').text()
+      participant_image = $(comment).find('.timeline-comment-avatar').clone()
 
       # You can't upvote your own pull request or vote twice
-      if participants[participantName] or participantName == authorName
-        return
-
+      #if participants[participant_name] or participant_name == author_name
+      #  return
       for regex in @regexes
-        if count = $(comment).html().match(regex)
+        console.log regex, timeline_comment.match(regex), timeline_comment
+        if timeline_comment.match(regex)
           ones += 1
-
           # Save name and image of participant
-          participants[participantName] = participantImage
+          participants[participant_name] = participant_image
           break
 
     return {
       ones: ones
       participants: participants
     }
-
 
   make_a_badge: (ones=0, extra_classes='') =>
     badge = undefined
@@ -133,9 +123,7 @@ class LooksGoodToMe
         badge.addClass('lgtm_best')
       else
         badge.addClass('lgtm_okay')
-
     return badge
-
 
   list_participants: (participants={}) =>
     list = $('<span>')
@@ -146,12 +134,10 @@ class LooksGoodToMe
       list.append(image)
     return list
 
-
   restore_options: =>
     chrome.storage.sync.get null, (items) =>
       $("#regexes").attr("checked", (items["show_badge"] == "true"))
       $("#refresh_rate").attr("checked", (items["show_notification"] == "true"))
-      $("#ci_status_selector").val(items["rss_url"])
       $("#default_plus_one_message").val(items["rss_url"])
 
     # Listen for storage changes
@@ -165,15 +151,7 @@ class LooksGoodToMe
     chrome.storage.sync.set()
       'regexes': $('#regexes').val()
       'refresh_rate': $('#refresh_rate').val()
-      'ci_status_selector': $('#ci_status_selector').val()
       'default_plus_one_message': $('#default_plus_one_message').val()
       , => message('Settings saved.')
-
-
-  # Some projects use a CI system which output the build status into Github
-  # pull request messages. If this is included, show on index pages.
-  get_ci_build_status_icon: (page_content) =>
-    $(".starting-comment img[src*=#{@ci_status_selector}]", page_content)
-
 
 window.looks_good_to_me = new LooksGoodToMe()
