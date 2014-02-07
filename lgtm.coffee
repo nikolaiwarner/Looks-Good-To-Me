@@ -79,7 +79,7 @@ class LooksGoodToMe
       button.click ->
         $(@).closest('form').find('.write-content textarea').html("#{message}")
         setTimeout(refresh, 5000)
-      button.insertBefore('.discussion-bubble .button.primary')
+      button.insertBefore('.timeline-new-comment .button.primary')
 
 
   # Count plus ones in each comment
@@ -89,15 +89,15 @@ class LooksGoodToMe
     participants = {}
 
     # Scrape out and count what we want from the string
-    $('.comment-body', string).each (index, comment) =>
+    $('.timeline-comment-wrapper', string).each (index, comment) =>
       # Clean up the comment body
       $(comment).find('.email-signature-reply').remove()
       $(comment).find('.email-quoted-reply').remove()
 
       # Capture information about particitpant
-      comment_bubble = $(comment).closest('.discussion-bubble')
-      participantName = $(comment_bubble).find('.comment-header-author').text()
-      participantImage = $(comment_bubble).find('.discussion-bubble-avatar').clone()
+      timeline_comment = $(comment).closest('.comment-body')
+      participantName = $(timeline_comment).find('.timeline-comment-header-text .author').text()
+      participantImage = $(timeline_comment).find('.timeline-comment-avatar').clone()
 
       # You can't upvote your own pull request or vote twice
       if participants[participantName] or participantName == authorName
