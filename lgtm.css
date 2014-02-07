@@ -1,8 +1,7 @@
 .lgtm_badge {
   padding: 2px 7px;
-  border-radius: 5px;
+  border-radius: 3px;
   color: #fff;
-  box-shadow: -2px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .lgtm_large {
@@ -27,12 +26,21 @@
   background-color: #6cc644;
 }
 
+.lgtm_button {
+  margin-right: 3px;
+}
+
 .lgtm_icon {
   margin-left: 5px;
 }
 
 .lgtm_participants {
   margin-left: 5px;
+}
+
+.lgtm_participants .timeline-comment-avatar {
+  float: none;
+  margin-left: 0;
 }
 
 .participant_thumb {
